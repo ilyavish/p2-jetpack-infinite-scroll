@@ -6,7 +6,8 @@ Standalone WordPress plugin that adds Jetpack Infinite Scroll support to the cla
 
 - Runs only when the active theme or parent theme is P2.
 - Runs only when Jetpack is available.
-- Uses Jetpack's click-based Infinite Scroll mode.
+- Defaults to Jetpack's click-based "Load more" mode for new installs.
+- Respects Jetpack's Reading setting when you choose load-on-scroll instead.
 - Appends posts into P2's real `ul#postlist` stream.
 - Renders posts through P2's own `p2_load_entry()` function.
 - Leaves the original P2 theme files untouched.

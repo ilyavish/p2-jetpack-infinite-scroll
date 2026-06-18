@@ -3,7 +3,7 @@
  * Plugin Name: P2 Jetpack Infinite Scroll Compatibility
  * Plugin URI: https://github.com/ilyavish/p2-jetpack-infinite-scroll
  * Description: Adds Jetpack Infinite Scroll support to the classic P2 theme without editing theme files.
- * Version: 1.0.0
+ * Version: 1.0.1
  * Author: Sudo
  * License: GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'P2_JETPACK_INFINITE_SCROLL_VERSION', '1.0.0' );
+define( 'P2_JETPACK_INFINITE_SCROLL_VERSION', '1.0.1' );
 define( 'P2_JETPACK_INFINITE_SCROLL_FILE', __FILE__ );
 
 /**
@@ -42,6 +42,14 @@ final class P2_Jetpack_Infinite_Scroll_Compatibility {
 	public static function bootstrap(): void {
 		add_action( 'after_setup_theme', array( __CLASS__, 'add_infinite_scroll_support' ), 20 );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_assets' ) );
+		register_activation_hook( P2_JETPACK_INFINITE_SCROLL_FILE, array( __CLASS__, 'activate' ) );
+	}
+
+	/**
+	 * Prefer click-to-load for new installs while still allowing Jetpack's setting to switch to scroll.
+	 */
+	public static function activate(): void {
+		self::maybe_set_default_behavior();
 	}
 
 	/**
@@ -52,10 +60,12 @@ final class P2_Jetpack_Infinite_Scroll_Compatibility {
 			return;
 		}
 
+		self::maybe_set_default_behavior();
+
 		add_theme_support(
 			'infinite-scroll',
 			array(
-				'type'           => 'click',
+				'type'           => 'scroll',
 				'container'      => self::P2_POST_CONTAINER,
 				'render'         => array( __CLASS__, 'render_posts' ),
 				'wrapper'        => false,
@@ -156,6 +166,19 @@ final class P2_Jetpack_Infinite_Scroll_Compatibility {
 			|| class_exists( 'Jetpack', false )
 			|| function_exists( 'jetpack_is_module_active' )
 			|| class_exists( 'Automattic\\Jetpack\\Status', false );
+	}
+
+	/**
+	 * Jetpack stores its Reading > Infinite Scroll Behavior checkbox in the
+	 * `infinite_scroll` option. An empty string means click-to-load; any
+	 * non-empty value means load-on-scroll. Adding the option only when it is
+	 * missing keeps click mode as this plugin's default while still letting
+	 * Jetpack's own checkbox choose either behavior afterward.
+	 */
+	private static function maybe_set_default_behavior(): void {
+		if ( null === get_option( 'infinite_scroll', null ) ) {
+			add_option( 'infinite_scroll', '' );
+		}
 	}
 }
 
