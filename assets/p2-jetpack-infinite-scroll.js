@@ -71,7 +71,20 @@
 		} );
 	}
 
+	function normalizePostList() {
+		$( '#postlist > .infinite-wrap' ).each( function() {
+			var $wrapper = $( this );
+			var $posts = $wrapper.children( 'li[id^="prologue-"]' );
+
+			if ( $posts.length ) {
+				$wrapper.replaceWith( $posts );
+			}
+		} );
+	}
+
 	$( document.body ).on( 'post-load', function() {
+		normalizePostList();
+
 		$( '#postlist > li[id^="prologue-"]' ).not( '.p2-jetpack-is-bound' ).each( function() {
 			$( this ).addClass( 'p2-jetpack-is-bound' );
 			bindAppendedEntry( this );

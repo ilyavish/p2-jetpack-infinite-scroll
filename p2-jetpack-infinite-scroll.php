@@ -3,7 +3,7 @@
  * Plugin Name: P2 Jetpack Infinite Scroll Compatibility
  * Plugin URI: https://github.com/ilyavish/p2-jetpack-infinite-scroll
  * Description: Adds Jetpack Infinite Scroll support to the classic P2 theme without editing theme files.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Sudo
  * License: GPL-2.0-or-later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'P2_JETPACK_INFINITE_SCROLL_VERSION', '1.0.1' );
+define( 'P2_JETPACK_INFINITE_SCROLL_VERSION', '1.0.2' );
 define( 'P2_JETPACK_INFINITE_SCROLL_FILE', __FILE__ );
 
 /**
@@ -91,7 +91,42 @@ final class P2_Jetpack_Infinite_Scroll_Compatibility {
 			true
 		);
 
-		$css = 'body.infinite-scroll #main > .navigation, body.infinite-scroll.neverending #main > .navigation { display: none; }';
+		$css = '
+			body.infinite-scroll #main > .navigation,
+			body.infinite-scroll.neverending #main > .navigation {
+				display: none;
+			}
+
+			#main ul#postlist > .infinite-wrap {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+			}
+
+			#main ul#postlist > .infinite-wrap > li {
+				list-style: none;
+			}
+
+			@media screen and (max-width: 480px) {
+				#main ul#postlist > .infinite-wrap > li {
+					font-size: 14px !important;
+					margin: 0;
+					padding: 10px;
+					position: relative;
+				}
+
+				#main ul#postlist > .infinite-wrap > li > h4 {
+					margin: -10px -10px -8px;
+					padding: 7px 10px 7px 40px;
+				}
+
+				#main ul#postlist > .infinite-wrap > li div.postcontent *,
+				#main ul#postlist > .infinite-wrap > li div.commentcontent * {
+					font-size: 13px !important;
+					line-height: 150% !important;
+				}
+			}
+		';
 		wp_register_style( 'p2-jetpack-infinite-scroll', false, array(), P2_JETPACK_INFINITE_SCROLL_VERSION );
 		wp_enqueue_style( 'p2-jetpack-infinite-scroll' );
 		wp_add_inline_style( 'p2-jetpack-infinite-scroll', $css );
